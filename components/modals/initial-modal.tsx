@@ -1,4 +1,6 @@
 'use client'
+import axios from 'axios'
+import { useEffect, useState } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -13,6 +15,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 
+import { FileUpload } from '@/components/file-upload'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -23,7 +26,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 const formSchema = z.object({
   name: z.string().nonempty('Please enter a name for your server'),
@@ -37,6 +40,7 @@ type newServerProps = z.infer<typeof formSchema>
 
 export const InitialModal = () => {
   const [isMounted, setIsMounted] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     setIsMounted(true)
@@ -53,7 +57,15 @@ export const InitialModal = () => {
   const isLoading = form.formState.isSubmitting
 
   const onSubmit = async (values: newServerProps) => {
-    console.log(values)
+    try {
+      await axios.post('/api/servers', values)
+
+      form.reset()
+      router.refresh()
+      window.location.reload()
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   if (!isMounted) {
@@ -78,7 +90,21 @@ export const InitialModal = () => {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="space-y-8 px-6">
               <div className="flex items-center justify-center text-center">
-                TODO: image upload component
+                <FormField
+                  control={form.control}
+                  name="imageUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <FileUpload
+                          endpoint="serverImage"
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
               </div>
 
               <FormField
