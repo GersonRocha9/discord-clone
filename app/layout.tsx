@@ -1,6 +1,7 @@
 import { ClerkProvider } from '@clerk/nextjs'
 import './globals.css'
 
+import { ModalProvider } from '@/components/providers/modal-provider'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { cn } from '@/lib/utils'
 import type { Metadata } from 'next'
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             enableSystem
             storageKey="discord-theme"
           >
+            <ModalProvider />
             {children}
           </ThemeProvider>
         </body>
